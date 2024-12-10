@@ -4,7 +4,7 @@ using UnityEngine;
 namespace HatefulScripts
 {
 	public class HatefulSetChallengeStatus : MonoBehaviour //script name change to avoid any potential conflicts with E&S
-
+	{
 		public void Awake()
 		{
 			bool active = this.Active;
