@@ -1,37 +1,65 @@
-﻿using System;
+using System.Collections;
 using HatefulScripts;
 using TMPro;
 using UnityEngine;
 
-namespace DoomahLevelLoader
+namespace HatefulScripts
 {
-	public class ChallengeInfo : MonoBehaviour
-	{
-		public void Awake()
-		{
-			this.ChallengeText = Plugin.FindObjectEvenIfDisabled("Player", "Main Camera/HUD Camera/HUD/FinishCanvas/Panel/Challenge/ChallengeText", 0, false);
-			this.ChallengeText.GetComponent<TextMeshProUGUI>().text = this.Challenge;
-			bool activeByDefault = this.ActiveByDefault;
-			if (activeByDefault)
-			{
-				MonoSingleton<ChallengeManager>.Instance.challengeFailed = false;
-				MonoSingleton<ChallengeManager>.Instance.challengeDone = true;
-			}
-			else
-			{
-				MonoSingleton<ChallengeManager>.Instance.challengeFailed = true;
-				MonoSingleton<ChallengeManager>.Instance.challengeDone = false;
-			}
-		}
+    public class HatefulChallengeInfo : MonoBehaviour
+    {
+        public void Awake()
+        {
+            StartCoroutine(FindAndInitialize());
+        }
 
-		// Token: 0x04000126 RID: 294
-		public string Challenge;
+        private IEnumerator FindAndInitialize()
+        {
+            while (this.ChallengeText == null)
+            {
+                this.ChallengeText = Plugin.FindObjectEvenIfDisabled("Player", "Main Camera/HUD Camera/HUD/FinishCanvas/Panel/Challenge/ChallengeText", 0, false);
+                if (this.ChallengeText == null)
+                {
+                    Debug.LogWarning("ChallengeText not found. Retrying...");
+                    yield return new WaitForSeconds(0.5f); // Wait before retrying
+                }
+            }
 
-		// Token: 0x04000127 RID: 295
-		public bool ActiveByDefault;
+            var textMeshPro = this.ChallengeText.GetComponent<TextMeshProUGUI>();
+            while (textMeshPro == null)
+            {
+                Debug.LogWarning("TextMeshProUGUI component not found. Retrying...");
+                yield return new WaitForSeconds(0.5f);
+                textMeshPro = this.ChallengeText.GetComponent<TextMeshProUGUI>();
+            }
 
-		// Token: 0x04000128 RID: 296
-		[HideInInspector]
-		public GameObject ChallengeText;
-	}
+            textMeshPro.text = this.Challenge;
+
+            while (MonoSingleton<ChallengeManager>.Instance == null)
+            {
+                Debug.LogWarning("ChallengeManager instance is null. Retrying...");
+                yield return new WaitForSeconds(0.5f);
+            }
+
+            bool activeByDefault = this.ActiveByDefault;
+            if (activeByDefault)
+            {
+                MonoSingleton<ChallengeManager>.Instance.challengeFailed = false;
+                MonoSingleton<ChallengeManager>.Instance.challengeDone = true;
+            }
+            else
+            {
+                MonoSingleton<ChallengeManager>.Instance.challengeFailed = true;
+                MonoSingleton<ChallengeManager>.Instance.challengeDone = false;
+            }
+
+            Debug.Log("HatefulChallengeInfo initialized successfully.");
+        }
+
+        public string Challenge;
+
+        public bool ActiveByDefault;
+
+        [HideInInspector]
+        public GameObject ChallengeText;
+    }
 }
