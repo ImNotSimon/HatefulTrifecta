@@ -1,12 +1,10 @@
 ﻿using System;
 using UnityEngine;
 
-namespace DoomahLevelLoader
+namespace HatefulScripts
 {
-	// Token: 0x02000028 RID: 40
-	public class SetChallengeStatus : MonoBehaviour
-	{
-		// Token: 0x060000F0 RID: 240 RVA: 0x00009E58 File Offset: 0x00008058
+	public class HatefulSetChallengeStatus : MonoBehaviour //script name change to avoid any potential conflicts with E&S
+
 		public void Awake()
 		{
 			bool active = this.Active;
@@ -21,8 +19,6 @@ namespace DoomahLevelLoader
 				MonoSingleton<ChallengeManager>.Instance.challengeDone = false;
 			}
 		}
-
-		// Token: 0x04000129 RID: 297
 		public bool Active;
 	}
 }
