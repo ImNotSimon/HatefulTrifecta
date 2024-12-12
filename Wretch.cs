@@ -119,7 +119,7 @@ public class Wretch : MonoBehaviour
 		this.weakpoint.SetActive(true);
 		this.mach.health = 99999f;
 		this.eid.health = 99999f;
-		this.HateBless(true);
+		this.HateBless();
 	}
 
 	// Token: 0x060000A7 RID: 167 RVA: 0x000071AC File Offset: 0x000053AC
@@ -167,21 +167,8 @@ public class Wretch : MonoBehaviour
 		}
 	}
 
-    public void HateBless(bool ignorePrevious = false)
+    public void HateBless()
     {
-        if (!ignorePrevious)
-        {
-            blessings++;
-            if (blessings > 1)
-            {
-                return;
-            }
-        }
-        if (!ignorePrevious && blessed)
-        {
-            return;
-        }
-        blessed = true;
         EnemyIdentifierIdentifier[] componentsInChildren = GetComponentsInChildren<EnemyIdentifierIdentifier>();
         foreach (EnemyIdentifierIdentifier enemyIdentifierIdentifier in componentsInChildren)
         {
@@ -194,15 +181,6 @@ public class Wretch : MonoBehaviour
             gameObject.transform.SetParent(enemyIdentifierIdentifier.transform, worldPositionStays: true);
             blessingGlows.Add(gameObject);
         }
-        if (burners == null || burners.Count <= 0)
-        {
-            return;
-        }
-        foreach (Flammable burner in burners)
-        {
-            burner.PutOut(getWet: false);
-        }
-        burners.Clear();
     }
 
     // Token: 0x060000AA RID: 170 RVA: 0x00007340 File Offset: 0x00005540
