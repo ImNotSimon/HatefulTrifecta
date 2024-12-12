@@ -11,7 +11,17 @@ public class Wretch : MonoBehaviour
 
     private Coroutine gasolineCoroutine;
 
-    // Token: 0x060000A3 RID: 163 RVA: 0x00006E80 File Offset: 0x00005080
+    private int blessings;
+
+    private bool blessed;
+
+    [HideInInspector]
+    public List<GameObject> blessingGlows = new List<GameObject>();
+
+	public GameObject blessingGlow;
+
+    private List<Flammable> burners;
+
     private void Start()
 	{
 		this.nma = base.GetComponent<NavMeshAgent>();
@@ -109,6 +119,7 @@ public class Wretch : MonoBehaviour
 		this.weakpoint.SetActive(true);
 		this.mach.health = 99999f;
 		this.eid.health = 99999f;
+		this.HateBless(true);
 	}
 
 	// Token: 0x060000A7 RID: 167 RVA: 0x000071AC File Offset: 0x000053AC
@@ -156,8 +167,46 @@ public class Wretch : MonoBehaviour
 		}
 	}
 
-	// Token: 0x060000AA RID: 170 RVA: 0x00007340 File Offset: 0x00005540
-	private void DamageStart()
+    public void HateBless(bool ignorePrevious = false)
+    {
+        if (!ignorePrevious)
+        {
+            blessings++;
+            if (blessings > 1)
+            {
+                return;
+            }
+        }
+        if (!ignorePrevious && blessed)
+        {
+            return;
+        }
+        blessed = true;
+        EnemyIdentifierIdentifier[] componentsInChildren = GetComponentsInChildren<EnemyIdentifierIdentifier>();
+        foreach (EnemyIdentifierIdentifier enemyIdentifierIdentifier in componentsInChildren)
+        {
+            GameObject gameObject = UnityEngine.Object.Instantiate(blessingGlow, enemyIdentifierIdentifier.transform.position, enemyIdentifierIdentifier.transform.rotation);
+            Collider component = enemyIdentifierIdentifier.GetComponent<Collider>();
+            if ((bool)component)
+            {
+                gameObject.transform.localScale = component.bounds.size;
+            }
+            gameObject.transform.SetParent(enemyIdentifierIdentifier.transform, worldPositionStays: true);
+            blessingGlows.Add(gameObject);
+        }
+        if (burners == null || burners.Count <= 0)
+        {
+            return;
+        }
+        foreach (Flammable burner in burners)
+        {
+            burner.PutOut(getWet: false);
+        }
+        burners.Clear();
+    }
+
+    // Token: 0x060000AA RID: 170 RVA: 0x00007340 File Offset: 0x00005540
+    private void DamageStart()
 	{
 		bool flag = !this.isEnraged;
 		if (flag)
