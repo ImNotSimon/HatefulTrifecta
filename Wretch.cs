@@ -1,4 +1,4 @@
-﻿//using System;
+//using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -31,7 +31,7 @@ public class Wretch : MonoBehaviour
 			this.difficulty = MonoSingleton<PrefsManager>.Instance.GetInt("difficulty", 0);
 		}
 		this.SlowUpdate();
-		if(this.difficulty > 2)
+		if(this.difficulty > 3)
 		{
             gasolineCoroutine = StartCoroutine(InstantiateGasolineRoutine());
         }
@@ -64,7 +64,7 @@ public class Wretch : MonoBehaviour
     }
     private void Update()
 	{
-		bool flag = this.difficulty > 2 && this.currentEnrageEffect == null && this.mach.health < this.maxHealth / 2f;
+		bool flag = this.difficulty > 3 && this.currentEnrageEffect == null && this.mach.health < this.maxHealth / 2f;
 		if (flag)
 		{
 			this.Enrage();
