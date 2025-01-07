@@ -189,6 +189,10 @@ public class Wretch : MonoBehaviour
         EnemyIdentifierIdentifier[] componentsInChildren = GetComponentsInChildren<EnemyIdentifierIdentifier>();
         foreach (EnemyIdentifierIdentifier enemyIdentifierIdentifier in componentsInChildren)
         {
+            if (enemyIdentifierIdentifier.transform.IsChildOf(weakpoint.transform))
+            {
+                continue;
+            }
             GameObject gameObject = UnityEngine.Object.Instantiate(blessingGlow, enemyIdentifierIdentifier.transform.position, enemyIdentifierIdentifier.transform.rotation);
             Collider component = enemyIdentifierIdentifier.GetComponent<Collider>();
             if ((bool)component)
