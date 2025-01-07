@@ -120,6 +120,10 @@ public class Wretch : MonoBehaviour
         this.mach.health = 99999f;
         this.eid.health = 99999f;
         this.HateBless(true);
+        if (difficulty == 3) {
+            this.anim.SetFloat("Speed", 1.55f);
+            this.nma.speed = 12.5f;
+        }
     }
 
     // Token: 0x060000A7 RID: 167 RVA: 0x000071AC File Offset: 0x000053AC
