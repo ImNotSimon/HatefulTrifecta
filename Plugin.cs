@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +12,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Configgy;
 
 namespace HatefulScripts
 {
@@ -26,7 +27,11 @@ namespace HatefulScripts
 			}
 		}
 
-		// Token: 0x060000BB RID: 187 RVA: 0x000077F0 File Offset: 0x000059F0
+		private ConfigBuilder config;
+		[Configgable("Optionals", "Enable Wretches in Cybergrind (may require game restart)")]
+		private static ConfigToggle cgWretch = new ConfigToggle(true);
+		
+		private static AssetBundle uibundle = Plugin.uibundle;
 		private void OnButtonClicked()
 		{
 			bool flag = this.chapterSelectTransform == null;
@@ -97,7 +102,6 @@ namespace HatefulScripts
 			return gameObject;
 		}
 
-		// Token: 0x060000BE RID: 190 RVA: 0x00007940 File Offset: 0x00005B40
 		public async void InstantiateMenuStuff()
 		{
 			bool flag = this.isMenuStuffInstantiated;
@@ -279,7 +283,6 @@ namespace HatefulScripts
             bool flag2 = SceneHelper.CurrentScene == "Main Menu";
             Plugin.allGameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
             bool flag3 = flag2 && SceneManager.GetActiveScene().name == "b3e7f2f8052488a45b35549efb98d902";
-
             if (flag3)
             {
                 this.InstantiateMenuStuff();
@@ -327,7 +330,6 @@ namespace HatefulScripts
                 {
                     hasReloadedSceneOnce = true;  // Ensure reload happens only once per scene load
 
-                    // Reload the current scene only once
                     SceneHelper.CurrentScene = SceneManager.GetActiveScene().name;
                     Camera main = Camera.main;
                     Plugin.IsCustomLevel = true;
@@ -381,6 +383,7 @@ namespace HatefulScripts
             }
 
             SpawnableObjectsDatabase[] array = this.FindAllInstances<SpawnableObjectsDatabase>();
+			PrefabDatabase[] cgEnemies = this.FindAllInstances<PrefabDatabase>();
             bool flag10 = this.wretchSO == null;
             if (flag10)
             {
@@ -397,38 +400,51 @@ namespace HatefulScripts
                     spawnableObjectsDatabase.enemies = list.ToArray();
                 }
             }
+			if(cgWretch.Value == true)
+			{
+			foreach (PrefabDatabase cyber in cgEnemies)
+             {
+				bool flag11 = cyber.meleeEnemies != null && !cyber.meleeEnemies.ToList().Contains(cgwretch);
+                if (flag11)
+                {
+					List<EndlessEnemy> list = cyber.meleeEnemies.ToList();
+                    list.Add(cgwretch);
+                    cyber.meleeEnemies = list.ToArray();
+                }
+           	 }
+			}
 
             this.unloadShit();
         }
 
 
         // Token: 0x060000C6 RID: 198 RVA: 0x00007E1C File Offset: 0x0000601C
-        private async Task DisableHellMap()
+        private bool hellMapDisabled = false;
+
+		private async Task DisableHellMap()
 		{
-			HellMap hellMapInstance = null;
-			while (hellMapInstance == null)
-			{
-				HellMap[] allHellMaps = Resources.FindObjectsOfTypeAll<HellMap>();
-				bool flag = allHellMaps.Length != 0;
-				if (flag)
-				{
-					hellMapInstance = allHellMaps[0];
-				}
-				await Task.Delay(50);
-				allHellMaps = null;
-			}
-			hellMapInstance.gameObject.SetActive(false);
-			Debug.Log("HellMap instance found and disabled.");
+    		HellMap hellMapInstance = null;
+    		while (hellMapInstance == null)
+    		{
+        		HellMap[] allHellMaps = Resources.FindObjectsOfTypeAll<HellMap>();
+        		if (allHellMaps.Length > 0)
+        		{
+            		hellMapInstance = allHellMaps[0];
+        		}
+        		await Task.Delay(50);
+    		}
+
+    		hellMapInstance.gameObject.SetActive(false);
+    		Debug.Log("HellMap instance found and disabled.");
 		}
 
-		// Token: 0x060000C7 RID: 199 RVA: 0x00007E60 File Offset: 0x00006060
 		private void OnSceneUnloaded(Scene scene)
 		{
 			bool flag = SceneHelper.CurrentScene == "Main Menu" && SceneManager.GetActiveScene().name == "b3e7f2f8052488a45b35549efb98d902";
 			if (flag)
 			{
 				ShaderManager.CreateShaderDictionary();
-				this.isMenuStuffInstantiated = false;
+				this.InstantiateMenuStuff();
 			}
 			SpawnableObjectsDatabase[] array = this.FindAllInstances<SpawnableObjectsDatabase>();
 			foreach (SpawnableObjectsDatabase spawnableObjectsDatabase in array)
@@ -452,6 +468,8 @@ namespace HatefulScripts
 		// Token: 0x060000C9 RID: 201 RVA: 0x00007F58 File Offset: 0x00006158
 		private void Awake()
 		{
+			config = new ConfigBuilder("ImNotSimon.HatefulTrifecta");
+	        config.BuildAll();
 			Debug.Log("don't you dare edit the .json to cheat :)");
 			Assembly executingAssembly = Assembly.GetExecutingAssembly();
 			Plugin._instance = this;
@@ -525,8 +543,8 @@ namespace HatefulScripts
 			else
 			{
 				SpawnableObject spawnableObject = this.loadedAssetBundle.LoadAsset<SpawnableObject>("Wretch_SO");
-				bool flag2 = spawnableObject.name == "Wretch_SO";
-				if (flag2)
+				EndlessEnemy wretch = this.loadedAssetBundle.LoadAsset<EndlessEnemy>("WretchEndlessData");
+				if (spawnableObject.name == "Wretch_SO")
 				{
 					this.wretchSO = spawnableObject;
 				}
@@ -534,6 +552,13 @@ namespace HatefulScripts
 				if (flag3)
 				{
 					Debug.LogError("'Wretch_SO' not found in bundle.");
+				}
+				if (wretch.name == "WretchEndlessData")
+				{
+					this.cgwretch = wretch;
+				}
+				else{
+					Debug.LogError("WretchEndlessData not found in bundle.");
 				}
 			}
 		}
@@ -707,6 +732,8 @@ namespace HatefulScripts
 		// Token: 0x040000F5 RID: 245
 		private SpawnableObject wretchSO;
 
+		private EndlessEnemy cgwretch;
+
 		// Token: 0x040000F6 RID: 246
 		public AssetBundle[] loadedBundlesList = new AssetBundle[99];
 
@@ -720,7 +747,7 @@ namespace HatefulScripts
 		public static AssetBundle resbundle;
 
 		// Token: 0x040000FA RID: 250
-		public static AssetBundle uibundle;
+		//public static AssetBundle uibundle;
 
 		// Token: 0x040000FB RID: 251
 		public Harmony harmony;
