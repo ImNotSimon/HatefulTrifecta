@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{98BF5077-6F2B-4A8A-A3AC-CE16697C9981}</ProjectGuid>
@@ -27,8 +27,8 @@
     <Compile Include="AssetBundleSceneLoader.cs" />
     <Compile Include="CustomButton.cs" />
     <Compile Include="DisableGameObject.cs" />
-    <Compile Include="DoomahLevelLoader\ChallengeInfo.cs" />
-    <Compile Include="DoomahLevelLoader\SetChallengeStatus.cs" />
+    <Compile Include="DoomahLevelLoader\HatefulChallengeInfo.cs" />
+    <Compile Include="DoomahLevelLoader\HatefulSetChallengeStatus.cs" />
     <Compile Include="DoomahLevelLoader\UnityComponents\AddressableReplacer.cs" />
     <Compile Include="DoomahLevelLoader\UnityComponents\ClashTriggerDisable.cs" />
     <Compile Include="DoomahLevelLoader\UnityComponents\ClashTriggerEnable.cs" />
@@ -328,6 +328,9 @@
     </Reference>
     <Reference Include="UnityEngine.UIModule">
       <HintPath>lib\UnityEngine.UIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="Configgy">
+      <HintPath>lib\Configgy.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UmbraModule">
       <HintPath>lib\UnityEngine.UmbraModule.dll</HintPath>
