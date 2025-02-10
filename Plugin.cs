@@ -1316,45 +1316,79 @@ namespace HatefulScripts
 			}
 		}
 
-		public static class MusicMan_Patch
-		{
-			public static void startFix(MusicManager __instance)
-			{
-				__instance.StartCoroutine(Plugin.MusicMan_Patch.waitForCustom(__instance));
-			}
+public static class MusicMan_Patch //I LOVE CONTINUOUS FRAME CHECKS!!!!!
+{
+    public static void startFix(MusicManager __instance)
+    {
+        __instance.StartCoroutine(Plugin.MusicMan_Patch.waitForCustom(__instance));
+    }
 
-            private static IEnumerator waitForCustom(MusicManager __instance)
+    private static IEnumerator waitForCustom(MusicManager __instance)
+    {
+        yield return new WaitForSeconds(0.35f);
+
+        try
+        {
+            __instance.battleTheme.outputAudioMixerGroup = MonoSingleton<AudioMixerController>.instance.musicGroup;
+            __instance.bossTheme.outputAudioMixerGroup = MonoSingleton<AudioMixerController>.instance.musicGroup;
+            __instance.cleanTheme.outputAudioMixerGroup = MonoSingleton<AudioMixerController>.instance.musicGroup;
+            __instance.targetTheme.outputAudioMixerGroup = MonoSingleton<AudioMixerController>.instance.musicGroup;
+        }
+        catch
+        {
+        }
+
+        yield return AdjustAudioSourcesAsync();
+
+        UnityEngine.Object[] array = null;
+        yield break;
+    }
+
+    private static IEnumerator AdjustAudioSourcesAsync()
+    {
+        // Continuously loop over all audio sources
+        while (true)
+        {
+            AudioSource[] allAudioSources = Resources.FindObjectsOfTypeAll<AudioSource>();
+
+            foreach (AudioSource audio in allAudioSources)
             {
-                yield return new WaitForSeconds(0.35f);
+                if (audio == null || audio.outputAudioMixerGroup == null)
+                    continue;
+
                 try
                 {
-                    __instance.battleTheme.outputAudioMixerGroup = MonoSingleton<AudioMixerController>.instance.musicGroup;
-                    __instance.bossTheme.outputAudioMixerGroup = MonoSingleton<AudioMixerController>.instance.musicGroup;
-                    __instance.cleanTheme.outputAudioMixerGroup = MonoSingleton<AudioMixerController>.instance.musicGroup;
-                    __instance.targetTheme.outputAudioMixerGroup = MonoSingleton<AudioMixerController>.instance.musicGroup;
+                    string currentMixerGroup = audio.outputAudioMixerGroup.audioMixer.name;
+
+                    if (currentMixerGroup.StartsWith("DoorAudio"))
+                    {
+                        audio.outputAudioMixerGroup = MonoSingleton<AudioMixerController>.instance.doorGroup;
+                    }
+                    else if (currentMixerGroup.StartsWith("GoreAudio"))
+                    {
+                        audio.outputAudioMixerGroup = MonoSingleton<AudioMixerController>.instance.goreGroup;
+                    }
+                    else if (currentMixerGroup.StartsWith("AllAudio"))
+                    {
+                        audio.outputAudioMixerGroup = MonoSingleton<AudioMixerController>.instance.allGroup;
+                    }
+                    else if (currentMixerGroup.StartsWith("UnfreezableAudio"))
+                    {
+                        audio.outputAudioMixerGroup = MonoSingleton<AudioMixerController>.instance.unfreezeableGroup;
+                    }
+                    else if (currentMixerGroup == "MusicAudio" || currentMixerGroup == "MusicAudio_0")
+                    {
+                        audio.outputAudioMixerGroup = MonoSingleton<AudioMixerController>.instance.musicGroup;
+                    }
                 }
                 catch
                 {
                 }
-
-                foreach (AudioSource audio in Resources.FindObjectsOfTypeAll(typeof(AudioSource)))
-                {
-                    try
-                    {
-                        bool flag2 = audio.outputAudioMixerGroup.audioMixer.name == "MusicAudio" || audio.outputAudioMixerGroup.audioMixer.name == "MusicAudio_0";
-                        if (flag2)
-                        {
-                            audio.outputAudioMixerGroup = MonoSingleton<AudioMixerController>.instance.musicGroup;
-                        }
-                    }
-                    catch
-                    {
-                    }
-                }
-
-                UnityEngine.Object[] array = null;
-                yield break;
             }
+
+            yield return null;
         }
     }
+}
+	}
 }
