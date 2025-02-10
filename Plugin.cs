@@ -1315,8 +1315,7 @@ namespace HatefulScripts
 				return text;
 			}
 		}
-
-public static class MusicMan_Patch //I LOVE CONTINUOUS FRAME CHECKS!!!!!
+public static class MusicMan_Patch
 {
     public static void startFix(MusicManager __instance)
     {
@@ -1346,7 +1345,6 @@ public static class MusicMan_Patch //I LOVE CONTINUOUS FRAME CHECKS!!!!!
 
     private static IEnumerator AdjustAudioSourcesAsync()
     {
-        // Continuously loop over all audio sources
         while (true)
         {
             AudioSource[] allAudioSources = Resources.FindObjectsOfTypeAll<AudioSource>();
@@ -1386,9 +1384,9 @@ public static class MusicMan_Patch //I LOVE CONTINUOUS FRAME CHECKS!!!!!
                 }
             }
 
-            yield return null;
+            yield return new WaitForSeconds(0.2f);
         }
     }
 }
-	}
+}
 }
