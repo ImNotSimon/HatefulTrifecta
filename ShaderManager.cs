@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -206,7 +206,7 @@ public class ShaderManagerRunner : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(0.15f);
+            yield return new WaitForSeconds(0.25f);
 
             yield return ShaderManager.ApplyShadersAsync(SceneManager.GetActiveScene().GetRootGameObjects());
             yield return ShaderManager.LoadShadersFromDictionaryAsync();
